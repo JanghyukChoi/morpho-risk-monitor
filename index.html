@@ -1,0 +1,82 @@
+<!doctype html><html lang=en><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Morpho Risk Monitor</title>
+<meta name=description content="Impaired exposure in Morpho lending markets, with nominal interest accrual stripped out.">
+<style>
+:root{--bg:#fbfbfa;--fg:#1a1a18;--dim:#71716c;--line:#e4e4e0;--hi:#b4461f;--card:#fff}
+:root:not([data-theme=light]){}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){
+ --bg:#16161a;--fg:#e8e8e4;--dim:#8f8f89;--line:#2c2c31;--hi:#e08a5f;--card:#1d1d22}}
+:root[data-theme=dark]{--bg:#16161a;--fg:#e8e8e4;--dim:#8f8f89;--line:#2c2c31;--hi:#e08a5f;--card:#1d1d22}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
+h2{font-size:17px;margin:44px 0 6px;letter-spacing:-.01em}
+.sub{font-weight:400;color:var(--dim);font-size:13px}
+.lead{color:var(--dim);margin:0 0 28px;font-size:14px}
+.note{color:var(--dim);font-size:13px;margin:0 0 14px;max-width:72ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:24px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px}
+.card .k{color:var(--dim);font-size:12px}
+.card .v{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+th{text-align:left;font-weight:500;color:var(--dim);border-bottom:1px solid var(--line);padding:7px 8px;font-size:12px}
+td{padding:7px 8px;border-bottom:1px solid var(--line)}
+.n{text-align:right;font-variant-numeric:tabular-nums}
+.hi{color:var(--hi);font-weight:600}
+.dim{color:var(--dim)}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px}
+a{color:inherit}
+@media(max-width:640px){.wrap{padding:28px 16px 60px}table{font-size:12px}h1{font-size:22px}}
+</style>
+<div class=wrap>
+<h1>Morpho Risk Monitor</h1>
+<p class=lead>Impaired exposure in Morpho lending markets, with <b>nominal interest accrual
+stripped out</b>. Rebuilt daily &middot; last update 2026-09-19 03:30 UTC</p>
+
+<div class=cards>
+ <div class=card><div class=k>Markets observed</div><div class=v>587</div></div>
+ <div class=card><div class=k>Impaired</div><div class=v>24</div></div>
+ <div class=card><div class=k>Unpriceable</div><div class=v>80</div></div>
+ <div class=card><div class=k>Days of record</div><div class=v>1</div></div>
+</div>
+
+<h2>Impaired markets <span class=sub>collateral no longer covers borrow</span></h2>
+<p class=note><b>Nominal supply</b> keeps compounding once a position cannot be repaid.
+<b>Corrected exposure</b> is the supply on the last day coverage was &ge; 1 &mdash; the principal
+actually at risk. The gap between the two columns is why this page exists.</p>
+<table><thead><tr><th>Collateral</th><th>Loan</th><th>LLTV</th><th>Collateral USD</th>
+<th>Nominal supply</th><th>Corrected</th></tr></thead><tbody><tr><td>PAXG</td><td>USDC</td><td class=n>0.92</td><td class=n>260</td><td class=n>9,103,435,632</td><td class=n class="n hi">95,036</td></tr><tr><td>sdeUSD</td><td>USDC</td><td class=n>0.92</td><td class=n>0</td><td class=n>6,018,265,650</td><td class=n class="n hi">8,684,531</td></tr><tr><td>wstUSR</td><td>USDC</td><td class=n>0.92</td><td class=n>656,900</td><td class=n>191,771,185</td><td class=n class="n hi">4,926</td></tr><tr><td>msY</td><td>USDC</td><td class=n>0.86</td><td class=n>17,050,643</td><td class=n>122,180,549</td><td class=n class="n hi">20,808,008</td></tr><tr><td>RLP</td><td>USDC</td><td class=n>0.86</td><td class=n>158,420</td><td class=n>63,308,005</td><td class=n class="n hi">3,726,223</td></tr><tr><td>USR</td><td>USDC</td><td class=n>0.92</td><td class=n>131,743</td><td class=n>24,390,345</td><td class=n class="n hi">11,697</td></tr><tr><td>msY</td><td>USDC</td><td class=n>0.92</td><td class=n>2,483,891</td><td class=n>14,717,864</td><td class=n class="n hi">3,816,400</td></tr><tr><td>USR</td><td>USDC</td><td class=n>0.92</td><td class=n>30,194</td><td class=n>9,068,739</td><td class=n class="n hi">10,457</td></tr><tr><td>RLP</td><td>AUSD</td><td class=n>0.86</td><td class=n>32,127</td><td class=n>7,016,393</td><td class=n class=n><span class=dim>not reconstructed</span></td></tr><tr><td>AVLT</td><td>USD₮0</td><td class=n>0.92</td><td class=n>127,416</td><td class=n>5,782,750</td><td class=n class=n><span class=dim>not reconstructed</span></td></tr><tr><td>amphrETH</td><td>WETH</td><td class=n>0.86</td><td class=n>869</td><td class=n>3,628,039</td><td class=n class="n hi">709</td></tr><tr><td>RLP</td><td>USDC</td><td class=n>0.86</td><td class=n>7,380</td><td class=n>1,607,687</td><td class=n class=n><span class=dim>not reconstructed</span></td></tr><tr><td>deUSD</td><td>USDC</td><td class=n>0.86</td><td class=n>0</td><td class=n>980,252</td><td class=n class="n hi">3,163</td></tr><tr><td>RLP</td><td>USDC</td><td class=n>0.86</td><td class=n>1,591</td><td class=n>370,655</td><td class=n class="n hi">36,149</td></tr><tr><td>cbBTC</td><td>wUSDL</td><td class=n>0.86</td><td class=n>3,311</td><td class=n>234,649</td><td class=n class=n><span class=dim>not reconstructed</span></td></tr><tr><td>AVLT</td><td>USDC</td><td class=n>0.86</td><td class=n>3,799</td><td class=n>78,059</td><td class=n class="n hi">4,489,319</td></tr><tr><td>yUSD</td><td>USDC</td><td class=n>0.92</td><td class=n>329</td><td class=n>77,803</td><td class=n class="n hi">334</td></tr><tr><td>yUSD</td><td>vbUSDC</td><td class=n>0.86</td><td class=n>1</td><td class=n>19,443</td><td class=n class=n><span class=dim>not reconstructed</span></td></tr><tr><td>yETH</td><td>WETH</td><td class=n>0.92</td><td class=n>739</td><td class=n>13,234</td><td class=n class="n hi">614</td></tr><tr><td>LBTC</td><td>dUSD</td><td class=n>0.77</td><td class=n>2,998</td><td class=n>12,881</td><td class=n class=n><span class=dim>not reconstructed</span></td></tr><tr><td>RLP</td><td>USR</td><td class=n>0.86</td><td class=n>82</td><td class=n>8,030</td><td class=n class=n><span class=dim>not reconstructed</span></td></tr><tr><td>yUSD</td><td>USDC</td><td class=n>0.92</td><td class=n>633</td><td class=n>2,988</td><td class=n class="n hi">229</td></tr><tr><td>USDC</td><td>LCAP</td><td class=n>0.92</td><td class=n>1,633</td><td class=n>1,700</td><td class=n class=n><span class=dim>not reconstructed</span></td></tr><tr><td>Wrapped-LP-sUSDE-31JUL</td><td>USDC</td><td class=n>0.92</td><td class=n>2</td><td class=n>1,112</td><td class=n class="n hi">2</td></tr></tbody></table>
+<h2>Vault exposure <span class=sub>nominal &rarr; corrected</span></h2>
+<p class=note>Nominal total $482,404,560 &rarr; corrected <b>$819,198</b>, a ~589&times; difference.
+Without this correction curators get flagged as impaired when they are not.
+These are <b>exposure ceilings</b>, not realised losses.</p>
+<table><thead><tr><th>Vault</th><th>Curator</th><th>Vault TVL</th>
+<th>Nominal</th><th>Corrected</th></tr></thead><tbody><tr><td>Adpend USDC</td><td><span class=dim>unregistered</span></td><td class=n>312,303,450</td><td class=n>312,303,450</td><td class='n hi'>450,663</td></tr><tr><td>1337 USDC</td><td><span class=dim>unregistered</span></td><td class=n>166,498,416</td><td class=n>166,498,416</td><td class='n hi'>240,262</td></tr><tr><td>Duplicated Key</td><td><span class=dim>unregistered</span></td><td class=n>1,393,636</td><td class=n>1,393,636</td><td class='n hi'>82,028</td></tr><tr><td>Apostro Resolv USDC</td><td>Apostro</td><td class=n>355,577</td><td class=n>1,008,886</td><td class='n hi'>36,488</td></tr><tr><td>MEV Capital Elixir USDC</td><td>MEV Capital</td><td class=n>976,276</td><td class=n>976,276</td><td class='n hi'>3,150</td></tr><tr><td>SovaBase USDC</td><td><span class=dim>unregistered</span></td><td class=n>48,631</td><td class=n>48,631</td><td class='n hi'>2,862</td></tr><tr><td>Landforge Premier USDC</td><td><span class=dim>unregistered</span></td><td class=n>13,861</td><td class=n>13,861</td><td class='n hi'>1,352</td></tr><tr><td>Tanken USDC</td><td><span class=dim>unregistered</span></td><td class=n>131,149</td><td class=n>131,149</td><td class='n hi'>1,091</td></tr><tr><td>Dapp-Learning-Vault</td><td><span class=dim>unregistered</span></td><td class=n>13,100</td><td class=n>13,100</td><td class='n hi'>608</td></tr><tr><td>ABRC</td><td><span class=dim>unregistered</span></td><td class=n>5,077</td><td class=n>7,871</td><td class='n hi'>230</td></tr><tr><td>alpha8USDC</td><td><span class=dim>unregistered</span></td><td class=n>3,842</td><td class=n>3,841</td><td class='n hi'>226</td></tr></tbody></table>
+<h2>Unpriceable collateral <span class=sub>cannot be judged either way</span></h2>
+<p class=note>With no price feed the collateral shows as $0. Reading that as impairment is a
+<b>false positive</b> &mdash; 19 of our own first 34 flags were exactly this. Listed separately
+rather than mixed into the table above.</p>
+<table><thead><tr><th>Collateral</th><th>Markets</th><th>Reported borrow</th></tr></thead>
+<tbody><tr><td>K</td><td class=n>1</td><td class=n>9,623,614,203</td></tr><tr><td>BONDUSD</td><td class=n>1</td><td class=n>3,604,445,919</td></tr><tr><td>HERMES</td><td class=n>25</td><td class=n>1,476,198,145</td></tr><tr><td>USDT</td><td class=n>2</td><td class=n>303,125,642</td></tr><tr><td>xUSD</td><td class=n>1</td><td class=n>122,881,267</td></tr><tr><td>sdeUSD</td><td class=n>1</td><td class=n>36,897,559</td></tr><tr><td>AZND</td><td class=n>1</td><td class=n>36,671,998</td></tr><tr><td>GVLT</td><td class=n>1</td><td class=n>35,705,407</td></tr><tr><td>PT-RLP-9APR2026</td><td class=n>1</td><td class=n>12,544,165</td></tr><tr><td>steakEURCV</td><td class=n>1</td><td class=n>11,489,412</td></tr><tr><td>sUSDv</td><td class=n>1</td><td class=n>8,046,997</td></tr><tr><td>rRLP</td><td class=n>1</td><td class=n>3,333,878</td></tr><tr><td>sNUSD</td><td class=n>1</td><td class=n>1,839,989</td></tr><tr><td>RSS</td><td class=n>1</td><td class=n>1,647,635</td></tr><tr><td>FUSD</td><td class=n>1</td><td class=n>1,495,110</td></tr></tbody></table>
+<h2>Observation log <span class=sub>each day's calls are recorded</span></h2>
+<p class=note>Most tools make calls and never score them. Every day's flags are written down here.
+Once enough incidents accumulate, precision and recall get published. While the record is short,
+that is stated plainly rather than hidden.</p>
+<table><thead><tr><th>Date</th><th>Markets</th><th>Impaired</th><th>Unpriceable</th></tr></thead>
+<tbody><tr><td>2026-09-19</td><td class=n>587</td><td class=n>24</td><td class=n>80</td></tr></tbody></table>
+
+<footer>
+<p><b>Method.</b> Principal is read as the supply on the last day coverage (collateral &divide;
+borrow) was &ge; 1. Everything after that is interest accruing on debt that cannot be repaid.
+On a preregistered test across 21 segments, median error was 4.8% and an exponential model beat
+both no-change and linear in 20 of 21.</p>
+<p><b>Limits.</b> These are <b>exposure ceilings</b>, not realised losses. Some markets retain
+recovery value, and mid-life vault deposits or withdrawals introduce error. The reported
+<code>supplyApy</code> is off by roughly 300&times; for these markets and is not used.</p>
+<p><b>Reproduce.</b> <code>python curator/run_all.py</code> &mdash; code, data and preregistrations
+are all in <a href="https://github.com/JanghyukChoi/morpho-risk-monitor">this repository</a>,
+including four approaches that were tested and rejected.</p>
+</footer>
+</div>

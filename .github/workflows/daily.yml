@@ -1,0 +1,32 @@
+name: daily
+
+# 매일 스냅샷을 적재하고 모니터 페이지를 다시 굽는다.
+# 건너뛴 날은 복구가 안 된다 — 마켓 상태는 시점 데이터라 소급이 불가능하다.
+on:
+  schedule:
+    - cron: "17 1 * * *"      # 매일 01:17 UTC
+  workflow_dispatch:           # 수동 실행도 가능
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: collect
+        run: python curator/snapshot.py
+      - name: build page
+        run: python curator/build_site.py
+      - name: commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ index.html
+          git diff --staged --quiet || git commit -m "daily snapshot $(date -u +%Y-%m-%d)"
+          git push
