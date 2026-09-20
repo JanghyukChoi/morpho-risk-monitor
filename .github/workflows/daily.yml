@@ -25,14 +25,16 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - name: collect
+      - name: collect morpho
         run: python curator/snapshot.py
+      - name: collect restaking
+        run: python restake/snapshot_restake.py
       - name: build page
         run: python curator/build_site.py
       - name: commit
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/ index.html
+          git add data/ data_restake/ index.html
           git diff --staged --quiet || git commit -m "daily snapshot $(date -u +%Y-%m-%d)"
           git push

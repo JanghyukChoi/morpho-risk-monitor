@@ -1,7 +1,7 @@
 <!doctype html><html lang=en><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>Morpho Risk Monitor</title>
-<meta name=description content="Impaired exposure in Morpho lending markets, with nominal interest accrual stripped out.">
+<title>Onchain Risk Monitor</title>
+<meta name=description content="Measured onchain risk: Morpho impaired exposure with interest accrual stripped out, and EigenLayer slashing exposure.">
 <style>
 :root{--bg:#fbfbfa;--fg:#1a1a18;--dim:#71716c;--line:#e4e4e0;--hi:#b4461f;--card:#fff}
 :root:not([data-theme=light]){}
@@ -31,9 +31,10 @@ a{color:inherit}
 @media(max-width:640px){.wrap{padding:28px 16px 60px}table{font-size:12px}h1{font-size:22px}}
 </style>
 <div class=wrap>
-<h1>Morpho Risk Monitor</h1>
-<p class=lead>Impaired exposure in Morpho lending markets, with <b>nominal interest accrual
-stripped out</b>. Rebuilt daily &middot; last update 2026-09-20 04:12 UTC</p>
+<h1>Onchain Risk Monitor</h1>
+<p class=lead>Numbers the ecosystem quotes, measured against the chain.
+Morpho impaired exposure with <b>interest accrual stripped out</b>, and EigenLayer
+<b>slashing exposure that is opt-in only</b>. Rebuilt daily &middot; last update 2026-09-20 08:12 UTC</p>
 
 <div class=cards>
  <div class=card><div class=k>Markets observed</div><div class=v>587</div></div>
@@ -60,6 +61,27 @@ These are <b>exposure ceilings</b>, not realised losses.</p>
 rather than mixed into the table above.</p>
 <table><thead><tr><th>Collateral</th><th>Markets</th><th>Reported borrow</th></tr></thead>
 <tbody><tr><td>K</td><td class=n>1</td><td class=n>9,841,572,872</td></tr><tr><td>BONDUSD</td><td class=n>1</td><td class=n>3,577,283,820</td></tr><tr><td>HERMES</td><td class=n>25</td><td class=n>1,495,699,936</td></tr><tr><td>USDT</td><td class=n>2</td><td class=n>306,652,208</td></tr><tr><td>xUSD</td><td class=n>1</td><td class=n>124,216,487</td></tr><tr><td>AZND</td><td class=n>1</td><td class=n>37,480,079</td></tr><tr><td>sdeUSD</td><td class=n>1</td><td class=n>37,439,136</td></tr><tr><td>GVLT</td><td class=n>1</td><td class=n>36,590,777</td></tr><tr><td>PT-RLP-9APR2026</td><td class=n>1</td><td class=n>12,855,461</td></tr><tr><td>steakEURCV</td><td class=n>1</td><td class=n>11,490,039</td></tr><tr><td>sUSDv</td><td class=n>1</td><td class=n>7,966,460</td></tr><tr><td>syrupUSDT</td><td class=n>1</td><td class=n>6,618,324</td></tr><tr><td>rRLP</td><td class=n>1</td><td class=n>3,384,097</td></tr><tr><td>sNUSD</td><td class=n>1</td><td class=n>1,869,363</td></tr><tr><td>RSS</td><td class=n>1</td><td class=n>1,687,776</td></tr></tbody></table>
+<h2>Restaking slashing exposure <span class=sub>EigenLayer, opt-in only</span></h2>
+<p class=note>Slashing on EigenLayer is <b>opt-in</b>: an operator must allocate magnitude to an
+operator set before any stake becomes slashable (<code>currentMagnitude == 0 &rarr; continue</code>
+in <code>_slashOperator</code>). So "how much is at risk" is arithmetic, not a forecast. The share
+that can be slashed is <code>currentMagnitude / maxMagnitude</code> &mdash; not <code>/1e18</code>,
+a correction that moved our own figure by +45%.</p>
+<div class=cards>
+ <div class=card><div class=k>Slashable now</div><div class=v>$5,251,899</div></div>
+ <div class=card><div class=k>Operators opted in</div><div class=v>24</div></div>
+ <div class=card><div class=k>AVSs</div><div class=v>9</div></div>
+ <div class=card><div class=k>Slashing events ever</div><div class=v>15</div></div>
+</div>
+<p class=note>Native restaked ETH (<code>beaconChainETHStrategy</code>) has <b>never appeared in an
+allocation event</b> &mdash; the largest pool has not opted in at all. Every one of the
+<b>15</b> <code>OperatorSlashed</code> events on record is a dummy test, a demo, or advertising
+placed in the <code>description</code> field; none is an operational slashing.</p>
+<table><thead><tr><th>AVS</th><th>Operators</th><th>Allocations</th><th>Slashable USD</th></tr></thead>
+<tbody><tr><td>0xe65c3eccd18879e103dbc9</td><td class=n>6</td><td class=n>6</td><td class='n hi'>3,499,665</td></tr><tr><td>0x12b75d5ed35320b33daf37</td><td class=n>1</td><td class=n>8</td><td class='n hi'>1,575,677</td></tr><tr><td>0x115c1d01133337f311c793</td><td class=n>8</td><td class=n>25</td><td class='n hi'>114,676</td></tr><tr><td>0x90c68bf0caca6b2a8ba7ed</td><td class=n>2</td><td class=n>3</td><td class='n hi'>61,876</td></tr><tr><td>0x26ddbf2a2f0bf8a7f656fa</td><td class=n>2</td><td class=n>2</td><td class='n hi'>5</td></tr><tr><td>0x06f682439e6893a96d70b4</td><td class=n>1</td><td class=n>2</td><td class='n hi'>0</td></tr><tr><td>0x66fd56588f73b9bde49722</td><td class=n>2</td><td class=n>4</td><td class='n hi'>0</td></tr><tr><td>0xbecc1d0b0eb3f1b7164f93</td><td class=n>2</td><td class=n>2</td><td class='n hi'>0</td></tr><tr><td>0xf07f83ff977dd004060f00</td><td class=n>1</td><td class=n>1</td><td class='n hi'>0</td></tr></tbody></table>
+<p class=note style="margin-top:18px">Every <code>OperatorSlashed</code> event, most recent first:</p>
+<table><thead><tr><th>Block</th><th>Operator</th><th>wad</th><th>description</th></tr></thead>
+<tbody><tr><td class=n>25314910</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995362</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995349</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995337</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995322</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995310</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr></tbody></table>
 <h2>Observation log <span class=sub>each day's calls are recorded</span></h2>
 <p class=note>Most tools make calls and never score them. Every day's flags are written down here.
 Once enough incidents accumulate, precision and recall get published. While the record is short,

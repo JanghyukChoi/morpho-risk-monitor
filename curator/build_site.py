@@ -141,6 +141,60 @@ that is stated plainly rather than hidden.</p>
 <tbody>%s</tbody></table>""" % rows
 
 
+def section_restake():
+    """재스테이킹 — 슬래싱 노출. 데이터는 alpha/restake/snapshot_restake.py 가 만든다."""
+    rp = ROOT / "data_restake"
+    pan = rp / "panel_restake.parquet"
+    ev = rp / "slashing_events.parquet"
+    alloc = rp / "restake_allocations.parquet"
+    if not pan.exists():
+        return ""
+    P = pd.read_parquet(pan).sort_values("date")
+    last = P.iloc[-1]
+    E = pd.read_parquet(ev) if ev.exists() else pd.DataFrame()
+    A = pd.read_parquet(alloc) if alloc.exists() else pd.DataFrame()
+    rows = ""
+    if len(A):
+        g = (A.groupby("avs").agg(ops=("operator", "nunique"), n=("strategy", "size"),
+                                  usd=("usd_slashable", "sum"))
+               .sort_values("usd", ascending=False).head(10))
+        rows = "".join(
+            "<tr><td>%s</td><td class=n>%d</td><td class=n>%d</td><td class='n hi'>%s</td></tr>"
+            % (_h.escape(str(k)[:24]), r["ops"], r["n"], fnum(r["usd"]))
+            for k, r in g.iterrows())
+    ev_rows = ""
+    if len(E):
+        for _, r in E.nlargest(6, "block").iterrows():
+            ev_rows += ("<tr><td class=n>%d</td><td>%s</td><td class=n>%.3f</td><td>%s</td></tr>"
+                        % (r["block"], _h.escape(str(r["operator"])[:12]), r["wad_max"],
+                           _h.escape(str(r["description"])[:40]) or "<span class=dim>—</span>"))
+    return """<h2>Restaking slashing exposure <span class=sub>EigenLayer, opt-in only</span></h2>
+<p class=note>Slashing on EigenLayer is <b>opt-in</b>: an operator must allocate magnitude to an
+operator set before any stake becomes slashable (<code>currentMagnitude == 0 &rarr; continue</code>
+in <code>_slashOperator</code>). So "how much is at risk" is arithmetic, not a forecast. The share
+that can be slashed is <code>currentMagnitude / maxMagnitude</code> &mdash; not <code>/1e18</code>,
+a correction that moved our own figure by +45%%.</p>
+<div class=cards>
+ <div class=card><div class=k>Slashable now</div><div class=v>$%s</div></div>
+ <div class=card><div class=k>Operators opted in</div><div class=v>%d</div></div>
+ <div class=card><div class=k>AVSs</div><div class=v>%d</div></div>
+ <div class=card><div class=k>Slashing events ever</div><div class=v>%d</div></div>
+</div>
+<p class=note>Native restaked ETH (<code>beaconChainETHStrategy</code>) has <b>never appeared in an
+allocation event</b> &mdash; the largest pool has not opted in at all. Every one of the
+<b>%d</b> <code>OperatorSlashed</code> events on record is a dummy test, a demo, or advertising
+placed in the <code>description</code> field; none is an operational slashing.</p>
+<table><thead><tr><th>AVS</th><th>Operators</th><th>Allocations</th><th>Slashable USD</th></tr></thead>
+<tbody>%s</tbody></table>
+<p class=note style="margin-top:18px">Every <code>OperatorSlashed</code> event, most recent first:</p>
+<table><thead><tr><th>Block</th><th>Operator</th><th>wad</th><th>description</th></tr></thead>
+<tbody>%s</tbody></table>""" % (
+        fnum(last["usd_slashable"]), int(last["n_operators"]), int(last["n_avs"]),
+        int(last["n_slash_events"]), int(last["n_slash_events"]),
+        rows or "<tr><td colspan=4 class=dim>none</td></tr>",
+        ev_rows or "<tr><td colspan=4 class=dim>none</td></tr>")
+
+
 CSS = """
 :root{--bg:#fbfbfa;--fg:#1a1a18;--dim:#71716c;--line:#e4e4e0;--hi:#b4461f;--card:#fff}
 :root:not([data-theme=light]){}
@@ -172,13 +226,14 @@ a{color:inherit}
 
 TPL = """<!doctype html><html lang=en><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>Morpho Risk Monitor</title>
-<meta name=description content="Impaired exposure in Morpho lending markets, with nominal interest accrual stripped out.">
+<title>Onchain Risk Monitor</title>
+<meta name=description content="Measured onchain risk: Morpho impaired exposure with interest accrual stripped out, and EigenLayer slashing exposure.">
 <style>%(css)s</style>
 <div class=wrap>
-<h1>Morpho Risk Monitor</h1>
-<p class=lead>Impaired exposure in Morpho lending markets, with <b>nominal interest accrual
-stripped out</b>. Rebuilt daily &middot; last update %(ts)s UTC%(stale)s</p>
+<h1>Onchain Risk Monitor</h1>
+<p class=lead>Numbers the ecosystem quotes, measured against the chain.
+Morpho impaired exposure with <b>interest accrual stripped out</b>, and EigenLayer
+<b>slashing exposure that is opt-in only</b>. Rebuilt daily &middot; last update %(ts)s UTC%(stale)s</p>
 
 <div class=cards>
  <div class=card><div class=k>Markets observed</div><div class=v>%(nmkt)s</div></div>
@@ -190,6 +245,7 @@ stripped out</b>. Rebuilt daily &middot; last update %(ts)s UTC%(stale)s</p>
 %(impaired)s
 %(vaults)s
 %(unpriced)s
+%(restake)s
 %(history)s
 
 <footer>
@@ -229,7 +285,8 @@ def main():
         css=CSS, ts=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"),
         nmkt=fnum(nmkt), nimp=nimp, nunp=nunp, ndays=ndays, stale=stale,
         impaired=imp_html, vaults=section_vaults(),
-        unpriced=unp_html, history=section_history()), encoding="utf-8")
+        unpriced=unp_html, restake=section_restake(),
+        history=section_history()), encoding="utf-8")
     print("index.html 생성 — 마켓 %s · 부실 %d · 가격불가 %d · 관측 %d일%s"
           % (fnum(nmkt), nimp, nunp, ndays, " · 지연 있음" if stale else ""))
 
