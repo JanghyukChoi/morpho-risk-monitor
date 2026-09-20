@@ -120,8 +120,19 @@ def section_history():
     g = (pm.groupby(pm.date.dt.date)
            .agg(markets=("mid", "nunique"), impaired=("flag_impaired", "sum"),
                 nopriced=("flag_nopriced", "sum")).tail(30))
-    rows = "".join("<tr><td>%s</td><td class=n>%d</td><td class=n>%d</td><td class=n>%d</td></tr>"
-                   % (d, r["markets"], r["impaired"], r["nopriced"]) for d, r in g.iterrows())
+    # ★ 빠진 날을 **드러낸다.** GitHub cron 은 보장되지 않아 실제로 누락이 생긴다.
+    #   묵은 데이터가 멀쩡해 보이는 것이 제일 나쁘다.
+    days = list(g.index)
+    rows = ""
+    for i, d in enumerate(days):
+        if i:
+            gap = (d - days[i - 1]).days - 1
+            if gap > 0:
+                rows += ("<tr><td colspan=4 class=dim>&mdash; %d day%s missing &mdash;</td></tr>"
+                         % (gap, "s" if gap > 1 else ""))
+        r = g.loc[d]
+        rows += ("<tr><td>%s</td><td class=n>%d</td><td class=n>%d</td><td class=n>%d</td></tr>"
+                 % (d, r["markets"], r["impaired"], r["nopriced"]))
     return """<h2>Observation log <span class=sub>each day's calls are recorded</span></h2>
 <p class=note>Most tools make calls and never score them. Every day's flags are written down here.
 Once enough incidents accumulate, precision and recall get published. While the record is short,
@@ -167,7 +178,7 @@ TPL = """<!doctype html><html lang=en><meta charset=utf-8>
 <div class=wrap>
 <h1>Morpho Risk Monitor</h1>
 <p class=lead>Impaired exposure in Morpho lending markets, with <b>nominal interest accrual
-stripped out</b>. Rebuilt daily &middot; last update %(ts)s UTC</p>
+stripped out</b>. Rebuilt daily &middot; last update %(ts)s UTC%(stale)s</p>
 
 <div class=cards>
  <div class=card><div class=k>Markets observed</div><div class=v>%(nmkt)s</div></div>
@@ -200,20 +211,27 @@ including four approaches that were tested and rejected.</p>
 def main():
     pm = load("panel_markets.parquet")
     nmkt = nimp = nunp = ndays = 0
+    stale = ""
     if pm is not None:
         pm["date"] = pd.to_datetime(pm.date)
         cur = pm[pm.date == pm.date.max()]
         nmkt, nimp = len(cur), int(cur.flag_impaired.sum())
         nunp, ndays = int(cur.flag_nopriced.sum()), pm.date.nunique()
+        # ★ 데이터가 묵었으면 **스스로 말한다.** 멀쩡해 보이는 것이 제일 나쁘다.
+        today = pd.Timestamp(datetime.now(timezone.utc).date())
+        lag = (today - pm.date.max().normalize()).days
+        if lag >= 1:
+            stale = ("  <b style='color:var(--hi)'>&middot; data is %d day%s old</b>"
+                     % (lag, "s" if lag > 1 else ""))
     imp_html, _ = section_impaired()
     unp_html, _ = section_unpriced()
     OUT.write_text(TPL % dict(
         css=CSS, ts=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"),
-        nmkt=fnum(nmkt), nimp=nimp, nunp=nunp, ndays=ndays,
+        nmkt=fnum(nmkt), nimp=nimp, nunp=nunp, ndays=ndays, stale=stale,
         impaired=imp_html, vaults=section_vaults(),
         unpriced=unp_html, history=section_history()), encoding="utf-8")
-    print("index.html 생성 — 마켓 %s · 부실 %d · 가격불가 %d · 관측 %d일"
-          % (fnum(nmkt), nimp, nunp, ndays))
+    print("index.html 생성 — 마켓 %s · 부실 %d · 가격불가 %d · 관측 %d일%s"
+          % (fnum(nmkt), nimp, nunp, ndays, " · 지연 있음" if stale else ""))
 
 
 if __name__ == "__main__":
