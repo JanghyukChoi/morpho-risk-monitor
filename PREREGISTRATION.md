@@ -66,3 +66,44 @@ median error 4.8%, exponential wins 20 of 21, terciles 86% / 100% / 100%.
 ### What does not depend on this test
 The measured gap between nominal and reconstructed principal is a direct reading of the
 supply series at the last day with coverage >= 1. It uses no model.
+
+---
+
+## C. Restaking slashing risk
+
+Written before any on-chain data was pulled.
+
+### Question
+```
+H0  AVS rewards >= expected slashing loss   (adequately priced)
+H1  AVS rewards <  expected slashing loss   (underpriced)
+```
+
+### Data policy
+On-chain events only. Aggregator APIs are used for cross-checking, never as the primary
+source — a prior project found an API reporting APYs off by ~300x.
+
+### Gates (fixed in advance)
+```
+G0  sample: >= 20 slashing events, >= 10 operators, >= 3 AVSs
+    below this -> publish as "underpowered", build no model
+G1  conclusion survives removing the single largest loss
+G2  sign consistent across AVS and strategy splits
+G3  conclusion survives removing test-like events
+G4  on-chain aggregate agrees with an external aggregate within +/-20%
+```
+
+### Anticipated failure modes
+```
+Small sample     slashing is a tail event; months of data cannot characterise a tail
+Exposure time    longer-exposed operators accumulate more events; normalise by stake x time
+Survivorship     an operator slashed and then exited must stay in the denominator
+Test events      an AVS may slash its own operator as a test -> separate by the
+                 `description` field and the magnitude of `wad`. Do not pool them.
+Single event     if one event dominates, the mean is meaningless
+Premium defn     token incentives inflate apparent rewards -> cash rewards only in the base case
+```
+
+**Outcome: G0 failed.** 15 events, 3 operators, 3 AVSs — and the `description` separation
+anticipated above showed all fifteen to be dummy tests, a demo, or advertising. No model built.
+Exposure was then measured directly instead, which requires no loss history.
