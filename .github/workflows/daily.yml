@@ -25,9 +25,15 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
+      # ★ 소스 하나가 죽어도 모니터 전체가 죽으면 안 된다.
+      #   실제로 공개 RPC 가 GitHub 러너 IP 를 막아 재스테이킹 수집이 실패했고
+      #   그 때문에 페이지 갱신·커밋까지 통째로 건너뛰었다(2026-09-20 run #3,#4).
+      #   각 수집은 실패해도 계속 가고, 페이지는 있는 데이터로 굽는다.
       - name: collect morpho
+        continue-on-error: true
         run: python curator/snapshot.py
       - name: collect restaking
+        continue-on-error: true
         run: python restake/snapshot_restake.py
       - name: build page
         run: python curator/build_site.py

@@ -34,7 +34,7 @@ a{color:inherit}
 <h1>Onchain Risk Monitor</h1>
 <p class=lead>Numbers the ecosystem quotes, measured against the chain.
 Morpho impaired exposure with <b>interest accrual stripped out</b>, and EigenLayer
-<b>slashing exposure that is opt-in only</b>. Rebuilt daily &middot; last update 2026-09-20 08:13 UTC</p>
+<b>slashing exposure that is opt-in only</b>. Rebuilt daily &middot; last update 2026-09-21 02:13 UTC  <b style='color:var(--hi)'>&middot; data is 1 day old</b></p>
 
 <div class=cards>
  <div class=card><div class=k>Markets observed</div><div class=v>587</div></div>
@@ -68,7 +68,7 @@ in <code>_slashOperator</code>). So "how much is at risk" is arithmetic, not a f
 that can be slashed is <code>currentMagnitude / maxMagnitude</code> &mdash; not <code>/1e18</code>,
 a correction that moved our own figure by +45%.</p>
 <div class=cards>
- <div class=card><div class=k>Slashable now</div><div class=v>$5,251,899</div></div>
+ <div class=card><div class=k>Slashable now</div><div class=v>$5,448,064</div></div>
  <div class=card><div class=k>Operators opted in</div><div class=v>24</div></div>
  <div class=card><div class=k>AVSs</div><div class=v>9</div></div>
  <div class=card><div class=k>Slashing events ever</div><div class=v>15</div></div>
@@ -78,7 +78,7 @@ allocation event</b> &mdash; the largest pool has not opted in at all. Every one
 <b>15</b> <code>OperatorSlashed</code> events on record is a dummy test, a demo, or advertising
 placed in the <code>description</code> field; none is an operational slashing.</p>
 <table><thead><tr><th>AVS</th><th>Operators</th><th>Allocations</th><th>Slashable USD</th></tr></thead>
-<tbody><tr><td>0xe65c3eccd18879e103dbc9</td><td class=n>6</td><td class=n>6</td><td class='n hi'>3,499,665</td></tr><tr><td>0x12b75d5ed35320b33daf37</td><td class=n>1</td><td class=n>8</td><td class='n hi'>1,575,677</td></tr><tr><td>0x115c1d01133337f311c793</td><td class=n>8</td><td class=n>25</td><td class='n hi'>114,676</td></tr><tr><td>0x90c68bf0caca6b2a8ba7ed</td><td class=n>2</td><td class=n>3</td><td class='n hi'>61,876</td></tr><tr><td>0x26ddbf2a2f0bf8a7f656fa</td><td class=n>2</td><td class=n>2</td><td class='n hi'>5</td></tr><tr><td>0x06f682439e6893a96d70b4</td><td class=n>1</td><td class=n>2</td><td class='n hi'>0</td></tr><tr><td>0x66fd56588f73b9bde49722</td><td class=n>2</td><td class=n>4</td><td class='n hi'>0</td></tr><tr><td>0xbecc1d0b0eb3f1b7164f93</td><td class=n>2</td><td class=n>2</td><td class='n hi'>0</td></tr><tr><td>0xf07f83ff977dd004060f00</td><td class=n>1</td><td class=n>1</td><td class='n hi'>0</td></tr></tbody></table>
+<tbody><tr><td>0xe65c3eccd18879e103dbc9</td><td class=n>6</td><td class=n>6</td><td class='n hi'>3,631,847</td></tr><tr><td>0x12b75d5ed35320b33daf37</td><td class=n>1</td><td class=n>8</td><td class='n hi'>1,634,379</td></tr><tr><td>0x115c1d01133337f311c793</td><td class=n>8</td><td class=n>25</td><td class='n hi'>117,811</td></tr><tr><td>0x90c68bf0caca6b2a8ba7ed</td><td class=n>2</td><td class=n>3</td><td class='n hi'>64,022</td></tr><tr><td>0x26ddbf2a2f0bf8a7f656fa</td><td class=n>2</td><td class=n>2</td><td class='n hi'>5</td></tr><tr><td>0x06f682439e6893a96d70b4</td><td class=n>1</td><td class=n>2</td><td class='n hi'>0</td></tr><tr><td>0x66fd56588f73b9bde49722</td><td class=n>2</td><td class=n>4</td><td class='n hi'>0</td></tr><tr><td>0xbecc1d0b0eb3f1b7164f93</td><td class=n>2</td><td class=n>2</td><td class='n hi'>0</td></tr><tr><td>0xf07f83ff977dd004060f00</td><td class=n>1</td><td class=n>1</td><td class='n hi'>0</td></tr></tbody></table>
 <p class=note style="margin-top:18px">Every <code>OperatorSlashed</code> event, most recent first:</p>
 <table><thead><tr><th>Block</th><th>Operator</th><th>wad</th><th>description</th></tr></thead>
 <tbody><tr><td class=n>25314910</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995362</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995349</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995337</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995322</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr><tr><td class=n>24995310</td><td>0x5accc90436</td><td class=n>1000000000000000000.000</td><td>👉 eigenyields.xyz/vaults</td></tr></tbody></table>

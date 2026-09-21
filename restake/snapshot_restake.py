@@ -31,8 +31,14 @@ OUT.mkdir(parents=True, exist_ok=True)
 STATE = OUT / "restake_state.json"
 PANEL = OUT / "panel_restake.parquet"
 EVENTS = OUT / "slashing_events.parquet"
+ALLOCS = OUT / "alloc_events.parquet"   # 배분 이벤트 **원장** — 증분 누적용
 
-RPCS = ["https://gateway.tenderly.co/public/mainnet", "https://rpc.mevblocker.io"]
+# ⚠ 공개 RPC 는 데이터센터 IP(GitHub 러너)를 막거나 조이는 경우가 있다.
+#   실제로 2026-09-20 예약 실행 2회가 여기서 실패했다. 후보를 넓히고 재시도를 늘린다.
+RPCS = ["https://gateway.tenderly.co/public/mainnet",
+        "https://rpc.mevblocker.io",
+        "https://eth.drpc.org",
+        "https://ethereum-rpc.publicnode.com"]
 AM = "0x948a420b8CC1d6BFd0B6087C2E7c344a2CD0bc39"
 DM = "0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A"
 DEPLOY = 22_218_956
@@ -54,7 +60,7 @@ def sel(s):
     return "0x" + _kec(s)[:8]
 
 
-def rpc(m, p, tries=3):
+def rpc(m, p, tries=5):
     for i in range(tries):
         for u in RPCS:
             try:
@@ -135,17 +141,27 @@ def main():
         E.to_parquet(EVENTS)
     print("■ 슬래싱 이벤트 신규 %d · 누적 %d" % (len(new), len(E)), flush=True)
 
-    # ── 2. 현재 배분 상태 (전수 재구성 — 이벤트 수가 적어 싸다)
+    # ── 2. 현재 배분 상태 — **배분 이벤트도 증분**으로 쌓는다
+    #   전에는 매 실행 DEPLOY(380만 블록)부터 전수 스캔했다. 이벤트가 적어 싸다고 봤지만
+    #   **블록 수**가 비싸다 — getLogs 76회 연속 호출이라 공개 RPC 에 차단당한다.
+    #   (2026-09-20 예약 실행 2회 실패 지점.) 원장을 append 로 쌓고 증분분만 붙인다.
+    #   groupby.last() 는 전체 이력에 대해 그대로 적용되므로 결과는 전수 스캔과 동일하다.
+    a_from = DEPLOY if not ALLOCS.exists() else int(st.get("alloc_last", DEPLOY - 1)) + 1
     rows = []
-    for lg in get_logs(t0(SIG_ALLOC), DEPLOY, head):
+    for lg in get_logs(t0(SIG_ALLOC), a_from, head):
         op, os_, strat, mag, eff = abi_decode(
             ["address", "(address,uint32)", "address", "uint64", "uint32"],
             bytes.fromhex(lg["data"][2:]))
         rows.append(dict(block=int(lg["blockNumber"], 16), operator=op, avs=os_[0],
                          set_id=os_[1], strategy=strat, magnitude=float(mag)))
     A = pd.DataFrame(rows)
+    if ALLOCS.exists():
+        A = (pd.concat([pd.read_parquet(ALLOCS), A], ignore_index=True)
+               .drop_duplicates(subset=["block", "operator", "avs", "set_id", "strategy"]))
+    print("■ 배분 이벤트 신규 %d · 누적 %d (스캔 시작 %d)" % (len(rows), len(A), a_from), flush=True)
     if not len(A):
         print("배분 없음"); return
+    A.to_parquet(ALLOCS)
     cur = (A.sort_values("block")
              .groupby(["operator", "avs", "set_id", "strategy"], as_index=False).last())
     act = cur[cur.magnitude > 0].copy()
@@ -185,7 +201,7 @@ def main():
         snap = pd.concat([old, snap], ignore_index=True)
     snap.to_parquet(PANEL)
     M.to_parquet(OUT / "restake_allocations.parquet")
-    STATE.write_text(json.dumps({"last_block": head}))
+    STATE.write_text(json.dumps({"last_block": head, "alloc_last": head}))
     print("■ 스냅샷 %s · 블록 %d" % (str(today)[:10], head))
     print("   배분 %d건 · 오퍼레이터 %d · AVS %d · 슬래싱가능 $%s"
           % (len(act), act.operator.nunique(), act.avs.nunique(),
