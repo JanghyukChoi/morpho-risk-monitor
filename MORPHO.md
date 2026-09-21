@@ -151,5 +151,5 @@ python curator/run_all.py --quick  # recompute from cached data
 
 Preregistration: `PREREGISTRATION.md`. Code: `curator/`. Data: `data/`.
 
-A daily snapshot panel is now running and records each day's impairment flags, so that
+A snapshot panel has been recording each day's impairment flags since 2026-09-19, so that
 forward predictions can be scored against outcomes rather than asserted.

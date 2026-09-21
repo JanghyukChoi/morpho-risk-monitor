@@ -134,7 +134,7 @@ Not supported   Any pricing of the tail. We deliberately did not build a model �
 - We verified the ERC20 slashing path in contract code. We did not line-by-line verify that the
   native-ETH path behaves identically; it does not affect the result because allocation there is zero.
 - This is a snapshot. Allocations can grow, and whether they are growing is the one thing worth
-  watching. A daily panel is now running.
+  watching. A panel has been recording since 2026-09-19.
 
 ## Preregistration
 
@@ -160,7 +160,7 @@ a personal token"*, several others cap ranges at 10–50 blocks. We surveyed 15 
 `gateway.tenderly.co` and `rpc.mevblocker.io` served the range. Without checking this you get zero
 results and conclude, wrongly, that nothing happened.
 
-Live monitor, rebuilt daily: <https://janghyukchoi.github.io/morpho-risk-monitor/>
+Live monitor: <https://janghyukchoi.github.io/morpho-risk-monitor/>
 
 Corrections welcome — in particular on the "33 events" figure, if someone can point to what it
 actually counted.

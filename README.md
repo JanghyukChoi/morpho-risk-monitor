@@ -4,7 +4,9 @@ Two numbers the ecosystem quotes, measured against the chain. Both came out smal
 headline — by 589x in one case and by roughly three orders of magnitude in the other. Code,
 data, preregistrations and every rejected approach are in this repository.
 
-**Live monitor, rebuilt daily:** <https://janghyukchoi.github.io/morpho-risk-monitor/>
+**Live monitor:** <https://janghyukchoi.github.io/morpho-risk-monitor/>
+The page states the date of the data it shows and flags it when that data is stale.
+Collection runs on free CI, so scheduled slots are best-effort and can be delayed.
 
 ---
 
@@ -67,7 +69,8 @@ python restake/fetch_slashing.py 22218956
 python restake/verify_formula.py
 ```
 
-Daily collection runs in GitHub Actions; each day's calls are written to the panel so forward
+Collection runs in GitHub Actions on a best-effort daily schedule; each run's calls are
+written to the panel so forward
 claims can be scored against outcomes rather than asserted.
 
 Preregistrations: **[PREREGISTRATION.md](PREREGISTRATION.md)** — including the gates that failed.
