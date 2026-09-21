@@ -233,7 +233,7 @@ TPL = """<!doctype html><html lang=en><meta charset=utf-8>
 <h1>Onchain Risk Monitor</h1>
 <p class=lead>Numbers the ecosystem quotes, measured against the chain.
 Morpho impaired exposure with <b>interest accrual stripped out</b>, and EigenLayer
-<b>slashing exposure that is opt-in only</b>. Rebuilt daily &middot; last update %(ts)s UTC%(stale)s</p>
+<b>slashing exposure that is opt-in only</b>. Data through %(dataday)s &middot; page built %(ts)s UTC%(stale)s</p>
 
 <div class=cards>
  <div class=card><div class=k>Markets observed</div><div class=v>%(nmkt)s</div></div>
@@ -267,12 +267,13 @@ including four approaches that were tested and rejected.</p>
 def main():
     pm = load("panel_markets.parquet")
     nmkt = nimp = nunp = ndays = 0
-    stale = ""
+    stale, dataday = "", "no data"
     if pm is not None:
         pm["date"] = pd.to_datetime(pm.date)
         cur = pm[pm.date == pm.date.max()]
         nmkt, nimp = len(cur), int(cur.flag_impaired.sum())
         nunp, ndays = int(cur.flag_nopriced.sum()), pm.date.nunique()
+        dataday = str(pm.date.max().normalize())[:10]
         # ★ 데이터가 묵었으면 **스스로 말한다.** 멀쩡해 보이는 것이 제일 나쁘다.
         today = pd.Timestamp(datetime.now(timezone.utc).date())
         lag = (today - pm.date.max().normalize()).days
@@ -283,7 +284,7 @@ def main():
     unp_html, _ = section_unpriced()
     OUT.write_text(TPL % dict(
         css=CSS, ts=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"),
-        nmkt=fnum(nmkt), nimp=nimp, nunp=nunp, ndays=ndays, stale=stale,
+        nmkt=fnum(nmkt), nimp=nimp, nunp=nunp, ndays=ndays, stale=stale, dataday=dataday,
         impaired=imp_html, vaults=section_vaults(),
         unpriced=unp_html, restake=section_restake(),
         history=section_history()), encoding="utf-8")

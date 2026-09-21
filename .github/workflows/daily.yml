@@ -26,13 +26,17 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       # ★ 소스 하나가 죽어도 모니터 전체가 죽으면 안 된다.
-      #   실제로 공개 RPC 가 GitHub 러너 IP 를 막아 재스테이킹 수집이 실패했고
-      #   그 때문에 페이지 갱신·커밋까지 통째로 건너뛰었다(2026-09-20 run #3,#4).
-      #   각 수집은 실패해도 계속 가고, 페이지는 있는 데이터로 굽는다.
+      #   2026-09-20 예약 실행 2회가 재스테이킹 수집에서 죽었고, 그 때문에
+      #   페이지 갱신·커밋까지 통째로 건너뛰었다. 수집은 서로 독립이어야 한다.
+      #   ⚠ 다만 **조용히 넘어가면 더 나쁘다** — 낡은 데이터가 초록 체크를 달고 올라간다.
+      #   그래서: 수집 실패해도 계속 가고(페이지는 스스로 "N days old" 를 표시),
+      #   마지막에 실패를 다시 세워 **job 을 빨갛게** 만든다.
       - name: collect morpho
+        id: morpho
         continue-on-error: true
         run: python curator/snapshot.py
       - name: collect restaking
+        id: restake
         continue-on-error: true
         run: python restake/snapshot_restake.py
       - name: build page
@@ -44,3 +48,11 @@ jobs:
           git add data/ data_restake/ index.html
           git diff --staged --quiet || git commit -m "daily snapshot $(date -u +%Y-%m-%d)"
           git push
+
+      # 데이터는 이미 올라갔다. 그래도 수집이 깨졌으면 빨갛게 남겨 눈에 띄게 한다.
+      - name: report collector failures
+        if: steps.morpho.outcome == 'failure' || steps.restake.outcome == 'failure'
+        run: |
+          echo "morpho=${{ steps.morpho.outcome }}  restaking=${{ steps.restake.outcome }}"
+          echo "페이지는 갱신·커밋됐지만 수집이 실패했다. 해당 소스는 낡은 상태다."
+          exit 1
