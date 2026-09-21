@@ -18,7 +18,7 @@
       python restake/snapshot_restake.py --check  신선도
 """
 from __future__ import annotations
-import json, sys, time
+import json, os, sys, time
 from pathlib import Path
 import requests
 import pandas as pd
@@ -227,3 +227,13 @@ if __name__ == "__main__":
     else:
         main()
         check()
+    # ⚠ 러너에서 **할 일을 다 마친 뒤** 인터프리터 종료 중에 SIGABRT 가 났다.
+    #   "terminate called without an active exception" · exit 134 (2026-09-21).
+    #   출력·parquet·상태파일 전부 정상이었고 **종료 코드만** 틀렸다.
+    #   그런데 CI 는 종료 코드로 판정하므로 수집 실패로 오인된다.
+    #   네이티브 확장의 종료 정리 문제라 파이썬에서 고칠 수 없다.
+    #   여기 도달했다는 건 예외 없이 끝났다는 뜻이다 — 버퍼만 비우고 나간다.
+    #   (main() 이 예외를 던지면 이 줄에 오지 못하므로 진짜 실패는 그대로 드러난다)
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(0)
