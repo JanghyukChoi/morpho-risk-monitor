@@ -4,3 +4,5 @@ requests>=2.31
 numpy>=1.26
 scipy>=1.11
 scikit-learn>=1.4
+pycryptodome>=3.20
+eth-abi>=5.0
