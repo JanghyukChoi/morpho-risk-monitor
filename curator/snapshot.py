@@ -51,17 +51,34 @@ def _f(v, d=0.0):
     except (TypeError, ValueError): return d
 
 def _page(q, page, key, S):
-    rows, k, tot = [], 0, None
+    """GraphQL 페이지 순회.
+
+    ⚠ 응답 검사는 **재시도 루프 안에서** 한다.
+      예전에는 errors 키만 보고 break 한 뒤 밖에서 r["data"] 를 깠다.
+      레이트리밋 응답은 errors 없이 message 만 들고 오므로 재시도를 그냥
+      빠져나가 KeyError: 'data' 로 죽었다(2026-09-21 러너 실행).
+      실패하면 상태코드와 본문 앞부분을 남긴다 — 원인을 못 보면 또 헤맨다.
+    """
+    rows, k = [], 0
     while True:
-        for a in range(4):
+        blk = None
+        for a in range(5):
             try:
-                r = S.post(URL, json={"query": q, "variables": {"s": page, "k": k}}, timeout=120).json()
-                if "errors" in r: raise RuntimeError(str(r["errors"])[:200])
+                resp = S.post(URL, json={"query": q, "variables": {"s": page, "k": k}}, timeout=120)
+                r = resp.json()
+                if "errors" in r:
+                    raise RuntimeError(str(r["errors"])[:200])
+                d = r.get("data")
+                if not isinstance(d, dict) or key not in d:
+                    raise RuntimeError("HTTP %d · 응답에 data.%s 가 없다: %s"
+                                       % (resp.status_code, key, str(r)[:160]))
+                blk = d[key]
                 break
             except Exception:
-                if a == 3: raise
-                time.sleep(2 + a*3)
-        blk = r["data"][key]; tot = blk["pageInfo"]["countTotal"]
+                if a == 4:
+                    raise
+                time.sleep(3 + a * 5)
+        tot = blk["pageInfo"]["countTotal"]
         rows += blk["items"]; k += page
         if k >= tot: break
     return rows
