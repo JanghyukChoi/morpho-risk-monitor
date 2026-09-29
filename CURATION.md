@@ -108,6 +108,8 @@ a cap.
 
 **R6. Publish refusals monthly.** Every market considered and rejected, with the reason,
 before anything happens to it. A refusal published after a failure is worth nothing.
+→ [reports/](reports/), starting [2026-09](reports/2026-09.md): 103 markets refused of 596
+observed, split between impaired and un-priceable.
 
 ---
 
