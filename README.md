@@ -48,6 +48,26 @@ A widely cited "33 slashing events in Q1 2026" does not appear on Ethereum mainn
 
 ---
 
+---
+
+## 3. Curation — a dead vault does not report as dead, it reports as large
+
+When a vault's assets sit almost entirely in impaired markets, the inflation propagates into
+its own reported total. Over the eleven days of panel data:
+
+| | Reported | Reconstructed |
+|---|---|---|
+| Adpend USDC, 11-day change | **+$78,257,762** | **+$0** |
+| 1337 USDC, 11-day change | **+$41,763,466** | **+$38** |
+
+Neither vault's share of the market moved, so the growth is not deposits. Both are 100%
+allocated to a market whose coverage broke on the Stream Finance date, 327 days ago.
+
+→ **[CURATION.md](CURATION.md)** — the table, the method, and six allocation rules fixed in
+advance (including the one written after I got the denominator wrong myself).
+
+---
+
 ## What is also published here
 
 Rejections, because they are what make the rest checkable:
@@ -65,6 +85,7 @@ Rejections, because they are what make the rest checkable:
 ```bash
 pip install -r requirements.txt
 python curator/run_all.py          # Morpho pipeline, ~7 min
+python curator/vault_exposure.py   # nominal vs reconstructed exposure by vault
 python restake/fetch_slashing.py 22218956
 python restake/verify_formula.py
 ```
